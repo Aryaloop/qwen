@@ -22,4 +22,6 @@ Route::middleware(['auth:admin'])->group(function () {
 
     // Categories
     Route::get('/categories', [KategoriController::class, 'index']);
+    // Kategori routes
+    Route::apiResource('categories', KategoriController::class)->except(['create', 'edit']);
 });
