@@ -1,32 +1,31 @@
-import { useState, useEffect } from "react";
+import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
+import { useAuth } from './hooks/useAuth';
+import Layout from './components/Layout/Layout';
+import Login from './components/Auth/Login';
+import Dashboard from './components/Dashboard/Dashboard';
+import BookList from './components/Books/BookList';
+import BookForm from './components/Books/BookForm';
 
 function App() {
-  const [books, setBooks] = useState([]);
+  const { isAuthenticated, loading } = useAuth();
 
-  useEffect(() => {
-    const API_URL = import.meta.env.VITE_API_URL;
-    fetch(`${API_URL}/books`)
-      .then(res => res.json())
-      .then(data => setBooks(data))
-      .catch(err => console.error("Error fetching books:", err));
-  }, []);
+  if (loading) {
+    return <div className="min-h-screen flex items-center justify-center">Loading...</div>;
+  }
 
   return (
-    <div className="p-4">
-      <h1 className="text-2xl font-bold mb-4">📚 Perpustakaan</h1>
-
-      {books.length > 0 ? (
-        <ul className="list-disc pl-6">
-          {books.map((book) => (
-            <li key={book.id}>
-              {book.judul} - {book.pengarang} ({book.tahun})
-            </li>
-          ))}
-        </ul>
-      ) : (
-        <p>Belum ada data buku.</p>
-      )}
-    </div>
+    <Router>
+      <Routes>
+        <Route 
+          path="/login" 
+          element={!isAuthenticated ? <Login /> : <Navigate to="/" />} 
+        />
+        <Route 
+          path="/*" 
+          element={isAuthenticated ? <Layout /> : <Navigate to="/login" />} 
+        />
+      </Routes>
+    </Router>
   );
 }
 
